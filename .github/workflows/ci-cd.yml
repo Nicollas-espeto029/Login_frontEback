@@ -2,12 +2,11 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "master" ]   # sua branch principal
+    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
 jobs:
-  # ================= CI =================
   test:
     name: Rodar "testes" no Back e Front
     runs-on: ubuntu-latest
@@ -21,7 +20,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-
       - name: Rodar teste do Backend (placeholder)
         run: |
           cd backend
@@ -32,17 +30,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-
       - name: Instalar e testar Frontend
         run: |
           cd frontend
           npm install
           npm test || echo "Nenhum teste definido ainda"
 
-  # ================= CD =================
   deploy:
     name: Deploy em Produção
-    needs: test   # só roda se a etapa de CI terminar
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -56,4 +52,3 @@ jobs:
       # ----- Deploy Frontend (Vercel) -----
       - name: Deploy Frontend na Vercel
         run: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }} --yes --name meu-projeto-frontend
-      
