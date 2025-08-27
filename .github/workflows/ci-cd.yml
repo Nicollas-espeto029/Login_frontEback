@@ -1,0 +1,67 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # ================= CI =================
+  test:
+    name: Rodar testes no Back e Front
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      # ----- Backend -----
+      - name: Configurar Node.js (Backend)
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Instalar dependências do Backend
+        run: cd backend && npm install
+
+      - name: Rodar testes do Backend
+        run: cd backend && npm test
+
+      # ----- Frontend -----
+      - name: Configurar Node.js (Frontend)
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Instalar dependências do Frontend
+        run: cd frontend && npm install
+
+      - name: Rodar testes do Frontend
+        run: cd frontend && npm test
+
+  # ================= CD =================
+  deploy:
+    name: Deploy em Produção
+    needs: test   # só roda se os testes passarem
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      # ----- Deploy do Backend (Railway) -----
+      - name: Deploy Backend no Railway
+        run: |
+          curl -fsSL https://railway.app/install.sh | sh
+          railway up --service backend
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      # ----- Deploy do Frontend (Vercel) -----
+      - name: Deploy Frontend na Vercel
+        run: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
