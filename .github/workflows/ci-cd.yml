@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master" ]   # sua branch é master
   pull_request:
     branches: [ "master" ]
 
@@ -21,28 +21,24 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
 
       - name: Instalar dependências do Backend
-        run: cd backend && npm install
-
-      - name: Rodar testes do Backend
-        run: cd backend && npm test
+        run: |
+          cd backend
+          npm install
+          npm test
 
       # ----- Frontend -----
       - name: Configurar Node.js (Frontend)
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
 
       - name: Instalar dependências do Frontend
-        run: cd frontend && npm install
-
-      - name: Rodar testes do Frontend
-        run: cd frontend && npm test
+        run: |
+          cd frontend
+          npm install
+          npm test
 
   # ================= CD =================
   deploy:
@@ -54,13 +50,9 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v3
 
-      # ----- Deploy do Backend (Railway) -----
-      - name: Deploy Backend no Railway
-        run: |
-          curl -fsSL https://railway.app/install.sh | sh
-          railway up --service backend
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      # ----- Deploy do Backend (Netlify) -----
+      - name: Deploy Backend na Netlify
+        run: npx netlify deploy --dir=backend --prod --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} --site=${{ secrets.NETLIFY_SITE_ID }}
 
       # ----- Deploy do Frontend (Vercel) -----
       - name: Deploy Frontend na Vercel
