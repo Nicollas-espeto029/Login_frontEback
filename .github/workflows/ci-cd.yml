@@ -53,6 +53,6 @@ jobs:
       - name: Deploy Backend na Netlify
         run: npx netlify deploy --dir=backend --prod --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} --site=${{ secrets.NETLIFY_SITE_ID }}
 
-      # ----- Deploy Frontend (Vercel) ----
+      # ----- Deploy Frontend (Vercel) -----
       - name: Deploy Frontend na Vercel
         run: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
