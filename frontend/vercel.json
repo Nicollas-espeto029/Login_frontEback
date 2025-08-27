@@ -1,0 +1,7 @@
+{
+    "name": "meu-projeto-frontend",
+    "builds": [
+      { "src": "package.json", "use": "@vercel/node" }
+    ]
+  }
+  
